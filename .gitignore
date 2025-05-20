@@ -1,0 +1,33 @@
+# ========== Android/Gradle ========== #
+.gradle/
+build/
+**/build/
+captures/
+.externalNativeBuild/
+.cxx/
+local.properties
+*.iml
+
+# ========== IntelliJ/Android Studio ========== #
+.idea/
+.idea/caches/
+.idea/libraries/
+.idea/modules.xml
+.idea/workspace.xml
+.idea/navEditor.xml
+.idea/assetWizardSettings.xml
+.settings/
+.project
+
+# ========== Java/Kotlin Build Artifacts ========== #
+*.class
+*.jar
+*.war
+*.ear
+
+# ========== Logs ========== #
+*.log
+
+# ========== OS-Specific Files ========== #
+.DS_Store
+Thumbs.db
