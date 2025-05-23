@@ -19,6 +19,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -32,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.learning.unitconverter.ui.theme.UnitConverterTheme
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,75 +51,110 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun UnitConverter(modifier: Modifier = Modifier) {
-    var expanded1 by remember { mutableStateOf(false) }
-    var expandedValue1 by remember { mutableStateOf("") }
 
-    var expanded2 by remember { mutableStateOf(false) }
-    var expandedValue2 by remember { mutableStateOf("") }
+    val inputList =
+        listOf("Centimeters", "Meters", "Kilometers", "Inches", "Feet", "Yards", "Miles")
+    val outputList =
+        listOf("Centimeters", "Meters", "Kilometers", "Inches", "Feet", "Yards", "Miles")
+
+    var inputValue by remember { mutableStateOf("") }
+    var outputValue by remember { mutableStateOf("") }
+    var inputUnit by remember { mutableStateOf("Meters") }
+    var outputUnit by remember { mutableStateOf("Meters") }
+    val iConversionFactor = remember { mutableStateOf(1.0) }
+    val oConversionFactor = remember { mutableStateOf(1.0) }
+
+    var iExpanded by remember { mutableStateOf(false) }
+    var oExpanded by remember { mutableStateOf(false) }
+
+
+    fun convert() {
+        val inputValueDouble = inputValue.toDoubleOrNull() ?: 0.0
+        val outputValueDouble =
+            (inputValueDouble * iConversionFactor.value * 100.0 / oConversionFactor.value).roundToInt() / 100.0
+        println(outputValueDouble.toString())
+        outputValue = outputValueDouble.toString()
+    }
 
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "Unit Converter")
+        Text(text = "Unit Converter", style = MaterialTheme.typography.headlineLarge)
         Spacer(modifier = Modifier.height(20.dp))
         OutlinedTextField(
-            value = "$expandedValue1 $expandedValue2",
+            value = inputValue,
             placeholder = { Text(text = "Enter a value") },
-            onValueChange = {}
+            onValueChange = {
+                inputValue = it
+                convert()
+            }
         )
         Spacer(modifier = Modifier.height(20.dp))
         Row {
             Box {
                 Button(onClick = {
-                    println("clicked")
-                    expanded1 = !expanded1
+                    iExpanded = !iExpanded
                 }) {
-                    Text("Select")
+                    Text(inputUnit)
                     Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Select an item")
                 }
-                DropdownMenu(expanded = expanded1, onDismissRequest = {}) {
-                    DropdownMenuItem(text = { Text("Item 1") }, onClick = {
-                        expandedValue1 = "Item 1"
-                        expanded1 = false
-                    })
-                    DropdownMenuItem(text = { Text("Item 2") }, onClick = {
-                        expandedValue1 = "Item 2"
-                        expanded1 = false
-                    })
-                    DropdownMenuItem(text = { Text("Item 3") }, onClick = {
-                        expandedValue1 = "Item 3"
-                        expanded1 = false
-                    })
+                DropdownMenu(expanded = iExpanded, onDismissRequest = {
+                    iExpanded = false
+                }) {
+                    inputList.forEach {
+                        DropdownMenuItem(text = { Text(it) }, onClick = {
+                            inputUnit = it
+                            iExpanded = false
+                            iConversionFactor.value = when (it) {
+                                "Centimeters" -> 0.01
+                                "Meters" -> 1.0
+                                "Kilometers" -> 1000.0
+                                "Inches" -> 0.0254
+                                "Feet" -> 0.3048
+                                "Yards" -> 0.9144
+                                "Miles" -> 1609.34
+                                else -> 0.01
+                            }
+                            convert()
+                        })
+                    }
                 }
             }
             Spacer(modifier = Modifier.width(16.dp))
             Box {
                 Button(onClick = {
-                    expanded2 = !expanded2
+                    oExpanded = !oExpanded
                 }) {
-                    Text("Select")
+                    Text(outputUnit)
                     Icon(Icons.Default.KeyboardArrowDown, contentDescription = "Select an item")
                 }
-                DropdownMenu(expanded = expanded2, onDismissRequest = {}) {
-                    DropdownMenuItem(text = { Text("Item 1") }, onClick = {
-                        expandedValue2 = "Item 1"
-                        expanded2 = false
-                    })
-                    DropdownMenuItem(text = { Text("Item 2") }, onClick = {
-                        expandedValue2 = "Item 2"
-                        expanded2 = false
-                    })
-                    DropdownMenuItem(text = { Text("Item 3") }, onClick = {
-                        expandedValue2 = "Item 3"
-                        expanded2 = false
-                    })
+                DropdownMenu(expanded = oExpanded, onDismissRequest = {
+                    oExpanded = false
+                }) {
+                    outputList.forEach {
+                        DropdownMenuItem(text = { Text(it) }, onClick = {
+                            outputUnit = it
+                            oExpanded = false
+                            oConversionFactor.value = when (it) {
+                                "Centimeters" -> 0.01
+                                "Meters" -> 1.0
+                                "Kilometers" -> 1000.0
+                                "Inches" -> 0.0254
+                                "Feet" -> 0.3048
+                                "Yards" -> 0.9144
+                                "Miles" -> 1609.34
+                                else -> 0.01
+                            }
+                            convert()
+                        })
+                    }
                 }
             }
         }
         Spacer(modifier = Modifier.height(16.dp))
-        Text("Result: TODO")
+        Text("Result: $outputValue", style = MaterialTheme.typography.headlineMedium)
     }
 }
 
